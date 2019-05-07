@@ -62,10 +62,6 @@
   please buy us a round!
   Distributed as-is; no warranty is given.
 *******************************************************************************/
-//#include "SparkFun_Photon_Weather_Shield_Library.h"
-//#include "OneWire.h"
-//#include "spark-dallas-temperature.h"
-//#include "SparkFunPhant.h"
 
 #define ONE_WIRE_BUS D4
 #define TEMPERATURE_PRECISION 11
@@ -139,13 +135,6 @@ volatile unsigned long raintime, rainlast, raininterval, rain;
 
 //Create Instance of HTU21D or SI7021 temp and humidity sensor and MPL3115A2 barrometric sensor
 Weather sensor;
-
-////////////PHANT STUFF//////////////////////////////////////////////////////////////////
-const char server[] = "data.sparkfun.com";
-const char publicKey[] = "your public address";
-const char privateKey[] = "your private address";
-//Phant phant(server, publicKey, privateKey);
-/////////////////////////////////////////////////////////////////////////////////////////
 
 void update18B20Temp(DeviceAddress deviceAddress, double &tempC);//predeclare to compile
 
@@ -286,12 +275,35 @@ void loop()
       //Get readings from all sensors
        getWeather();
        printInfo();
+       Particle.publish("cloud4bees", JSON(), PRIVATE); // Send JSON Particle Cloud
        //postToPhant();
        count = 0;
     }
   }
 }
 //---------------------------------------------------------------
+
+String JSON() {
+ String ret = "&field1=";
+  //ret.concat(stringGewicht);
+  ret.concat(winddir);
+  ret.concat("&field2=");
+  ret.concat(windspeedmph);
+  ret.concat("&field3=");
+  ret.concat(rainin);
+  ret.concat("&field4=");
+  ret.concat(tempf);
+  ret.concat("&field5=");
+  ret.concat(humidity);
+  ret.concat("&field6=");
+  ret.concat(pascals);
+  ret.concat("&field7=");
+  ret.concat(soiltempf);
+  ret.concat("&field6=");
+  ret.concat(soilMoisture);
+  return ret;
+}
+
 void printInfo()
 {
   //This function prints the weather data out to the default Serial Port
